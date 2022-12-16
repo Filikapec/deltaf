@@ -4,6 +4,7 @@ import PIL.Image, PIL.ImageTk # pip install pillow
 import cv2 # pip install opencv-python
 from pygrabber.dshow_graph import FilterGraph # pip install pygrabber
 import numpy as np
+import sastavljanjeslika as slike
 
 customtkinter.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "green", "dark-blue"
@@ -96,8 +97,8 @@ class App(customtkinter.CTk):
         self.vid = MyVideoCapture(self.video_source)
 
         # Create a canvas that can fit the above video source size
-        self.canvas = tk.Canvas(self, width=250, height = self.vid.height)  #width = self.vid.width
-        self.canvas.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.canvas = tk.Canvas(self, width=self.vid.width, height = self.vid.height, background="#000000", borderwidth=cv2.BORDER_TRANSPARENT, border=cv2.BORDER_TRANSPARENT)  #width = self.vid.width
+        self.canvas.grid(row=0, column=1, padx=(0, 0), pady=(0, 0), sticky="nsew")
 
         self.delay = 15
         self.update()        
@@ -110,7 +111,7 @@ class App(customtkinter.CTk):
         if return_value:
             try:
                 #analyze Frame and check for QR Code
-                frame = self.analyzeFrame(frame)
+                frame = slike.stackImages(1, ([self.analyzeFrame(frame)]))
                 
                 self.photo = PIL.ImageTk.PhotoImage(image = PIL.Image.fromarray(frame))
                 self.canvas.create_image(0, 0, image = self.photo, anchor = tk.NW)
@@ -136,8 +137,11 @@ class App(customtkinter.CTk):
         mask = cv2.inRange(img, lower, upper)
 
         mask_contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        
+        print(type(mask))
 
         if len(mask_contours) != 0:
+            indexobjekta =0
             for mask_contour in mask_contours:
                 if cv2.contourArea(mask_contour) > 500:
                     x, y, w, h = cv2.boundingRect(mask_contour)
@@ -145,7 +149,10 @@ class App(customtkinter.CTk):
                     hpixprenos = h
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 3) #drawing rectangle
                     cv2.circle(frame, (int(x+w/2), int(y+h/2)), 15, (50,255, 20))
-        return frame
+                    indexobjekta+=1
+                    cv2.putText(frame, ("Objekat broj: " + str(indexobjekta)), (x+w+20, y+20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
+        
+        return [frame, mask]
 
 
 class MyVideoCapture:
