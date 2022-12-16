@@ -39,10 +39,51 @@ class App(customtkinter.CTk):
         self.sidebar_button_1 = customtkinter.CTkButton(self.sidebar_frame, text="Connect Camera", command=self.sidebar_button_event)
         self.sidebar_button_1.grid(row=2, column=0, padx=20, pady=10)
 
-        # QR Code Label
-        self.qr_label = customtkinter.CTkLabel(self, text="QR")
-        self.qr_label.grid(row=2, column=1, padx=20, pady=(10, 0))
+        self.tabview = customtkinter.CTkTabview(self, width=250)
+        self.tabview.grid(row=0, column=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.tabview.add("Stani/Kreni")
+        self.tabview.add("Objekt 1")
+        self.tabview.add("Objekt 2")
+        self.tabview.tab("Stani/Kreni").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
+        self.tabview.tab("Objekt 1").grid_columnconfigure(0, weight=1)
+        self.slider_progressbar_frame = customtkinter.CTkFrame(self.tabview.tab("Objekt 1"), fg_color="transparent")
+        self.slider_progressbar_frame.grid(row=1, column=1, columnspan=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
+        self.slider_progressbar_frame.grid_columnconfigure(0, weight=1)
+        self.slider_progressbar_frame.grid_rowconfigure(4, weight=1)
+        #HSV1
+        self.labelH1 = customtkinter.CTkLabel(self.slider_progressbar_frame, text="Hue")
+        self.labelH1.grid(row=0, column=0, padx=(0,0), pady=(0, 0), sticky="nw")
+        self.slider_1 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=180, number_of_steps=180)
+        self.slider_1.grid(row=1, column=0, padx=(0, 0), pady=(10, 10), sticky="ew")
+        self.labelS1 = customtkinter.CTkLabel(self.slider_progressbar_frame, text="Saturation")
+        self.labelS1.grid(row=3, column=0, padx=(0,0), pady=(0, 0), sticky="nw")
+        self.slider_2 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=255, number_of_steps=180)
+        self.slider_2.grid(row=4, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
+        self.labelV1 = customtkinter.CTkLabel(self.slider_progressbar_frame, text="Value")
+        self.labelV1.grid(row=6, column=0, padx=(0,0), pady=(0, 0), sticky="nw")
+        self.slider_3 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=255, number_of_steps=180)
+        self.slider_3.grid(row=7, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
+        #HSV2
+        self.slider_4 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=180, number_of_steps=180)
+        self.slider_4.grid(row=2, column=0, padx=(0, 0), pady=(10, 10), sticky="ew")
+        self.slider_5 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=255, number_of_steps=180)
+        self.slider_5.grid(row=5, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
+        self.slider_6 = customtkinter.CTkSlider(self.slider_progressbar_frame, from_=0, to=255, number_of_steps=180)
+        self.slider_6.grid(row=8, column=0, padx=(20, 10), pady=(10, 10), sticky="ew")
 
+        self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
+        self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
+        self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame, values=["80%", "90%", "100%", "110%", "120%"], command=self.change_scaling_event)
+        self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
+
+    def klizac(self, stagod):
+        value = self.slider_1.get()
+        print(self.slider_1.get())
+
+    
+    def change_scaling_event(self, new_scaling: str):
+        new_scaling_float = int(new_scaling.replace("%", "")) / 100
+        customtkinter.set_widget_scaling(new_scaling_float)
 
     def sidebar_button_event(self):
         print("try to open camera: " + self.combobox.get())   
@@ -55,8 +96,8 @@ class App(customtkinter.CTk):
         self.vid = MyVideoCapture(self.video_source)
 
         # Create a canvas that can fit the above video source size
-        self.canvas = tk.Canvas(self, width = self.vid.width, height = self.vid.height)
-        self.canvas.grid(row=0, rowspan=4, column=1)
+        self.canvas = tk.Canvas(self, width=250, height = self.vid.height)  #width = self.vid.width
+        self.canvas.grid(row=0, column=1, padx=(20, 0), pady=(20, 0), sticky="nsew")
 
         self.delay = 15
         self.update()        
@@ -88,8 +129,10 @@ class App(customtkinter.CTk):
     def analyzeFrame(self, frame):
         font = cv2.FONT_HERSHEY_SIMPLEX
         img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        lower = np.array([0, 0, 0])
-        upper = np.array([180, 115, 102])
+        #lower = np.array([0, 0, 0])
+        lower = np.array([self.slider_1.get(), self.slider_2.get(), self.slider_3.get()])
+        #upper = np.array([180, 115, 102])
+        upper = np.array([self.slider_4.get(), self.slider_5.get(), self.slider_6.get()])
         mask = cv2.inRange(img, lower, upper)
 
         mask_contours, hierarchy = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -104,13 +147,6 @@ class App(customtkinter.CTk):
                     cv2.circle(frame, (int(x+w/2), int(y+h/2)), 15, (50,255, 20))
         return frame
 
-    #find the QR Code and draw a rectangle around it
-    def decodedObjects(self, decodedObject, frame, font):
-        x, y, w, h = cv2.boundingRect(decodedObject)
-
-        cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 3)
-        
-        return frame 
 
 class MyVideoCapture:
     def __init__(self, video_source=0):
