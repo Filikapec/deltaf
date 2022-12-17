@@ -129,7 +129,7 @@ class App(customtkinter.CTk):
         print(self.brojobjekata)
         elementi = []
         for i in range(self.brojobjekata):
-            elementi.append(pozicije[i])
+            elementi.append(pozicije[len(pozicije)-self.brojobjekata+i])
         #pozicije = elementi
 
         return elementi
