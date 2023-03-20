@@ -213,12 +213,13 @@ class App(customtkinter.CTk):
             for mask_contour in mask_contours:
                 if cv2.contourArea(mask_contour) > 500:
                     x, y, w, h = cv2.boundingRect(mask_contour)
-                    pozicije.append(klasa.Pozicija(x+w/2, y+h/2, indexobjekta))
+                    pozicije.append(klasa.Pozicija(x+w/2, y+h/2, indexobjekta))  #ovo iskoristiti
                     cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 3) #drawing rectangle
                     cv2.circle(frame, (int(x+w/2), int(y+h/2)), 15, (50,255, 20))
                     indexobjekta+=1
                     brojregistrovanihobjekata+=1
                     cv2.putText(frame, ("Objekat broj: " + str(indexobjekta)), (x+w+20, y+20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
+                    cv2.putText(frame, ("Dimenzije: " + str(w*50/150) + " " + str(h*50/150)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
             
 
         if len(mask_contours2) != 0:
@@ -270,3 +271,8 @@ class MyVideoCapture:
 if __name__ == "__main__":
     app = App()
     app.mainloop()
+
+
+#Proporcija je da je 150px = 50mm
+
+#32.4 i 35
