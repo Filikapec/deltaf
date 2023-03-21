@@ -20,12 +20,14 @@ offsetC = {-16.44, -28.54, 7.5};
 
 float duzinaVeza = 264;
 
-Slider SliderA, SliderB, SliderC;
+int SliderApoz = 0, SliderBpoz = 0, SliderCpoz = 0;
 
 void setup() {
   Serial.begin(9600);
   PodesiPinove();
-  InicijalizujSlidere(SliderA, SliderB, SliderC);
+  /*SliderA = Slider{dirA, stpB, 20};
+  SliderB = Slider{dirB, stpB, 0};
+  SliderC = Slider{dirC, stpC, 0};*/
 }
 
 void loop() {
@@ -107,7 +109,10 @@ void Kinematika(Point3D Target) {
   Debug(oiz);
 
   //sumultanoKretanje(putanjastpA, putanjastpB, putanjastpC, 6000);
-  kretanje(putanjastpA, putanjastpB, putanjastpC);
+  kretanje(putanjastpA-SliderApoz, putanjastpB-SliderBpoz, putanjastpC-SliderCpoz);
+  SliderApoz = putanjastpA;
+  SliderBpoz = putanjastpB;
+  SliderCpoz = putanjastpC;
   
 }
 
