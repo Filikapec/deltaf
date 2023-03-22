@@ -15,9 +15,9 @@ customtkinter.set_default_color_theme("blue")  # Themes: "blue" (standard), "gre
 pozicije = []
 #brojobjekata = 0
 
-#============  SERIJSKA  ======================================================
-deltaRobot = serial.Serial(port='COM7', baudrate=9600, timeout=.1)
-time.sleep(0.5)
+#======================= SERIJSKA ============================
+delta = serial.Serial(port='COM7', baudrate=9600, timeout=.1)
+time.sleep(0.1)
 
 
 class App(customtkinter.CTk):
@@ -59,12 +59,12 @@ class App(customtkinter.CTk):
         self.tabview.tab("Stani/Kreni").grid_columnconfigure(0, weight=1)  # configure grid of individual tabs
         self.tabview.tab("Objekt 1").grid_columnconfigure(0, weight=1)
         #prvi tab
-        self.zapocnibtn = customtkinter.CTkButton(self.tabview.tab("Stani/Kreni"), text="Zapocni")
+        self.zapocnibtn = customtkinter.CTkButton(self.tabview.tab("Stani/Kreni"), text="Zapocni", command=self.pozicijeIspis)
         self.zaustavibtn = customtkinter.CTkButton(self.tabview.tab("Stani/Kreni"), text="Zaustavi")
-        self.pozcijebtn = customtkinter.CTkButton(self.tabview.tab("Stani/Kreni"), text="Pozicije", command=self.pozicijeIspis)
+        self.sakrijplatformubtn = customtkinter.CTkButton(self.tabview.tab("Stani/Kreni"), text="Pregledaj", command=self.sakrijplatformu)
         self.zapocnibtn.grid(row=0, column=0, padx=20, pady=(30,10))
         self.zaustavibtn.grid(row=1, column=0, padx=20, pady=10)
-        self.pozcijebtn.grid(row=2, column=0, padx=20, pady=10)
+        self.sakrijplatformubtn.grid(row=2, column=0, padx=20, pady=10)
         #drugi tab
         self.slider_progressbar_frame = customtkinter.CTkFrame(self.tabview.tab("Objekt 1"), fg_color="transparent")
         self.slider_progressbar_frame.grid(row=1, column=1, columnspan=2, padx=(20, 0), pady=(20, 0), sticky="nsew")
@@ -133,7 +133,7 @@ class App(customtkinter.CTk):
         customtkinter.set_widget_scaling(new_scaling_float)
     
     def stabilisipozicije(self):
-        print(self.brojobjekata)
+        #print(self.brojobjekata)
         elementi = []
         for i in range(self.brojobjekata):
             elementi.append(pozicije[len(pozicije)-self.brojobjekata+i])
@@ -146,14 +146,31 @@ class App(customtkinter.CTk):
         #pozicije=[] #resetujem listu pozicija
         pozicije = self.stabilisipozicije()
         #print(brojobjekata)
+
+        brojPredmeta = "R" + str(len(pozicije))
+        delta.write(bytes(brojPredmeta, 'utf-8'))
+        print(bytes(brojPredmeta, 'utf-8'))
+
+        time.sleep(3)
+
         
         for i in range(len(pozicije)):
             #print(str(pozicije[i].x) + " " + str(pozicije[i].y) + " " + str(pozicije[i].gr))
-            #print(str(pozicije[i].x*50/150) + " " + str(pozicije[i].y*50/150) + " " + str(30))
-            print(pozicije[i])
+            pozicije[i].x = pozicije[i].x * 50 / 150 - 81.8
+            pozicije[i].y = pozicije[i].y * 50 / 150 - 87.8
+            #print(str(pozicije[i].x) + " " + str(pozicije[i].y) + " " + str(pozicije[i].gr))
+            pozicijaZaPoslati = str(str(round(pozicije[i].y, 2)) + " " + str(round(pozicije[i].x, 2)) + " " + "10")
+            #delta.write(bytes(pozicijaZaPoslati, 'utf-8'))
+            #print("---------------------------------")
+            print(bytes(pozicijaZaPoslati, 'utf-8'))
+            delta.write(bytes(pozicijaZaPoslati, 'utf-8'))
+            time.sleep(2)
 
-            
-            
+
+    def sakrijplatformu(self):
+        speckar = "100 10 55"
+        delta.write(bytes(speckar, 'utf-8'))
+        time.sleep(0.5)
 
 
     def sidebar_button_event(self):

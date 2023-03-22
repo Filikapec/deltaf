@@ -3,9 +3,16 @@
 #include "Point2D.h"
 #include <math.h>
 
+#define BRZINA_KORAKA 5
+
 String naredbe[30];
 Point3D pozicije[30];
 int brojkomandi=0;
+
+float tolerancijaTargeta = 2.5; //deo donje platforme
+
+Point3D PregledPozicija = {100, 10, 55}; //Tacka gde ne smetas kameri
+Point3D Skladiste = {0, 0, 0};
 
 Point3D ADG = {74.35,0,242.5},
 AGG={161.33, 0, 329.47},
@@ -24,7 +31,11 @@ int SliderApoz = 0, SliderBpoz = 0, SliderCpoz = 0;
 
 void setup() {
   Serial.begin(9600);
+  Serial.setTimeout(10);
   PodesiPinove();
+  delay(2000);
+  //Izvrsi(PregledPozicija);
+  //kretanje(5,5,5, 2000); delay(1000);
   /*SliderA = Slider{dirA, stpB, 20};
   SliderB = Slider{dirB, stpB, 0};
   SliderC = Slider{dirC, stpC, 0};*/
@@ -34,13 +45,23 @@ void loop() {
   if(Serial.available()) {
     CitajSerijsku();
     for(int i=0; i<brojkomandi; i++) {
-      Izvrsi(pozicije[i]);
+      Point3D tackaiznad = {pozicije[i].x, pozicije[i].y, 60};
+      Izvrsi(tackaiznad, BRZINA_KORAKA);
+      delay(100);
+      Izvrsi(pozicije[i], 3);
+      Uhvati(1);
+      delay(100);
+      Izvrsi(tackaiznad, 3);
+      Uhvati(0);
+
     }
+      //Vrati se na poziciju gde ne smetas kameri
+      Izvrsi(PregledPozicija, BRZINA_KORAKA);
     
   }
 }
 
-void Izvrsi(Point3D Target) {
+void Izvrsi(Point3D Target, int brzinakoraka) {
   Kinematika(Target);
 }
 
@@ -48,7 +69,7 @@ Point3D StringToPoint3D(String input) {
   String xval = input.substring(0, input.indexOf(' '));
   String yval = input.substring(input.indexOf(' '), input.lastIndexOf(' '));
   String zval = input.substring(input.lastIndexOf(' '), input.length());
-  Point3D izlaz = {xval.toFloat(), yval.toFloat(), zval.toFloat()};
+  Point3D izlaz = {xval.toFloat(), yval.toFloat(), zval.toFloat()+tolerancijaTargeta};
   return izlaz;
 }
 
@@ -67,9 +88,8 @@ void CitajSerijsku() {
         Serial.print("Primljen broj ");
         Serial.println(i);
       }
-    }
-    for(int i = 0; i < brojkomandi; i++) {
-      
+    } else if(ulaz.charAt(0)=='K') {
+      Izvrsi(PregledPozicija, BRZINA_KORAKA);
     }
 }
 
@@ -109,7 +129,7 @@ void Kinematika(Point3D Target) {
   Debug(oiz);
 
   //sumultanoKretanje(putanjastpA, putanjastpB, putanjastpC, 6000);
-  kretanje(putanjastpA-SliderApoz, putanjastpB-SliderBpoz, putanjastpC-SliderCpoz);
+  kretanje(putanjastpA-SliderApoz, putanjastpB-SliderBpoz, putanjastpC-SliderCpoz, (abs(putanjastpA-SliderApoz) + abs(putanjastpB-SliderBpoz) + abs(putanjastpC-SliderCpoz))*BRZINA_KORAKA);
   SliderApoz = putanjastpA;
   SliderBpoz = putanjastpB;
   SliderCpoz = putanjastpC;

@@ -5,6 +5,7 @@
 #define stpB 6
 #define stpC 7
 #define en 8
+#define mag 12
 
 void PodesiPinove() {
   pinMode(dirA, OUTPUT);
@@ -15,6 +16,7 @@ void PodesiPinove() {
   pinMode(stpC, OUTPUT);
   pinMode(en, OUTPUT);
   digitalWrite(en, HIGH);
+  pinMode(mag, OUTPUT);
 }
 
 typedef struct {
@@ -22,6 +24,16 @@ typedef struct {
   int stp;
   int poz = 0;
 } Slider;
+
+
+
+void Uhvati(int yn) {
+  if(yn) {
+    digitalWrite(mag, HIGH);
+  } else {
+    digitalWrite(mag, LOW);
+  }
+}
 
  void InicijalizujSlidere(Slider a, Slider b, Slider c) {
   /*a.dir = dirA;
@@ -38,31 +50,37 @@ typedef struct {
   c = Slider{dirC, stpC, 0};*/
 }
 
-void kretanje(int a, int b, int c) {
+unsigned long eventTimeA, eventTimeB, eventTimeC;
+unsigned long prevA=0, prevB=0, prevC=0;
+void kretanje(int a, int b, int c, unsigned long trajanje) {
   digitalWrite(dirA, a>=0);
   digitalWrite(dirB, b>=0);
   digitalWrite(dirC, c>=0);
+  eventTimeA = trajanje/abs(a);
+  eventTimeB = trajanje/abs(b);
+  eventTimeC = trajanje/abs(c);
   
+  unsigned long pocetak = millis();
   digitalWrite(en, LOW);
+  while(millis()-pocetak<trajanje) {
+    unsigned long currentTime = millis();
 
-  for(int i = 0; i<abs(a); i++) {
-    digitalWrite(stpA, HIGH);
-    delay(5);
-    digitalWrite(stpA, LOW);
-    delay(5);
+    if(currentTime-prevA>=eventTimeA && a != 0) {
+      digitalWrite(stpA, LOW);
+      digitalWrite(stpA, HIGH);
+      prevA = currentTime;
+    }
+    if(currentTime-prevB>=eventTimeB && b != 0) {
+      digitalWrite(stpB, LOW);
+      digitalWrite(stpB, HIGH);
+      prevB = currentTime;
+    }
+    if(currentTime-prevC>=eventTimeC && c != 0) {
+      digitalWrite(stpC, LOW);
+      digitalWrite(stpC, HIGH);
+      prevC = currentTime;
+    }
   }
-  for(int i = 0; i<abs(b); i++) {
-    digitalWrite(stpB, HIGH);
-    delay(5);
-    digitalWrite(stpB, LOW);
-    delay(5);
-  }
-  for(int i = 0; i<abs(c); i++) {
-    digitalWrite(stpC, HIGH);
-    delay(5);
-    digitalWrite(stpC, LOW);
-    delay(5);
-  }
-  
   digitalWrite(en, HIGH);
+  
 }
