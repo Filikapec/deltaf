@@ -159,7 +159,7 @@ class App(customtkinter.CTk):
             pozicije[i].x = pozicije[i].x * 50 / 150 - 81.8
             pozicije[i].y = pozicije[i].y * 50 / 150 - 87.8
             #print(str(pozicije[i].x) + " " + str(pozicije[i].y) + " " + str(pozicije[i].gr))
-            pozicijaZaPoslati = str(str(round(pozicije[i].y, 2)) + " " + str(round(pozicije[i].x, 2)) + " " + "5")
+            pozicijaZaPoslati = str(str(round(pozicije[i].y, 2)) + " " + str(round(pozicije[i].x, 2)) + " " + "23") #23 = 4 + 19
             #delta.write(bytes(pozicijaZaPoslati, 'utf-8'))
             #print("---------------------------------")
             print(bytes(pozicijaZaPoslati, 'utf-8'))

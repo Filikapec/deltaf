@@ -12,8 +12,8 @@ int brojkomandi=0;
 float tolerancijaTargeta = 2.5+3; //deo donje platforme
 
 Point3D PregledPozicija = {100, 10, 55}; //Tacka gde ne smetas kameri
-Point3D Skladiste = {0, -90, 30};
-Point3D iznadSkladista = {0, -90, 40};
+Point3D Skladiste = {0, -90, 20+20};
+Point3D iznadSkladista = {0, -90, 60};
 
 Point3D ADG = {74.35,0,242.5},
 AGG={161.33, 0, 329.47},
@@ -53,7 +53,7 @@ void loop() {
       delay(100);
       Izvrsi(pozicije[i], BRZINA_KORAKA);
       Uhvati(1);
-      delay(100);
+      delay(250);
       Izvrsi(tackaiznad, BRZINA_KORAKA);
       Izvrsi(iznadSkladista, BRZINA_KORAKA);
       Izvrsi(Skladiste, BRZINA_KORAKA);

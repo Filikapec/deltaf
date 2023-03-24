@@ -151,7 +151,7 @@ class App(customtkinter.CTk):
         delta.write(bytes(brojPredmeta, 'utf-8'))
         print(bytes(brojPredmeta, 'utf-8'))
 
-        time.sleep(3)
+        time.sleep(0.5)
 
         
         for i in range(len(pozicije)):
@@ -164,7 +164,7 @@ class App(customtkinter.CTk):
             #print("---------------------------------")
             print(bytes(pozicijaZaPoslati, 'utf-8'))
             delta.write(bytes(pozicijaZaPoslati, 'utf-8'))
-            time.sleep(2)
+            time.sleep(1)
 
 
     def sakrijplatformu(self):
@@ -247,8 +247,8 @@ class App(customtkinter.CTk):
                     brojregistrovanihobjekata+=1
                     cv2.putText(frame, ("Objekat broj: " + str(indexobjekta)), (x+w+20, y+20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
                     #cv2.putText(frame, ("Dimenzije: " + str(w) + " " + str(h)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
-                    cv2.putText(frame, ("Poz: " + str(x+w/2) + " " + str(y+h/2)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
-            
+                    #cv2.putText(frame, ("Poz: " + str(x+w/2) + " " + str(y+h/2)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
+                    cv2.putText(frame, ("Poz: " + str(round((((y+h/2)-248) * 23.7 / 74), 2)) + " " + str(round((((x+w/2) - 248) * 23.7 / 74), 2))), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
 
         if len(mask_contours2) != 0:
             indexobjekta =0
