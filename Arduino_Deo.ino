@@ -9,10 +9,11 @@ String naredbe[30];
 Point3D pozicije[30];
 int brojkomandi=0;
 
-float tolerancijaTargeta = 2.5; //deo donje platforme
+float tolerancijaTargeta = 2.5+3; //deo donje platforme
 
 Point3D PregledPozicija = {100, 10, 55}; //Tacka gde ne smetas kameri
-Point3D Skladiste = {0, 0, 0};
+Point3D Skladiste = {0, -90, 30};
+Point3D iznadSkladista = {0, -90, 40};
 
 Point3D ADG = {74.35,0,242.5},
 AGG={161.33, 0, 329.47},
@@ -31,7 +32,7 @@ int SliderApoz = 0, SliderBpoz = 0, SliderCpoz = 0;
 
 void setup() {
   Serial.begin(9600);
-  Serial.setTimeout(10);
+  Serial.setTimeout(100);
   PodesiPinove();
   delay(2000);
   //Izvrsi(PregledPozicija);
@@ -45,14 +46,22 @@ void loop() {
   if(Serial.available()) {
     CitajSerijsku();
     for(int i=0; i<brojkomandi; i++) {
-      Point3D tackaiznad = {pozicije[i].x, pozicije[i].y, 60};
+      Serial.print("Izvrsavam "); Serial.println(i);
+      Point3D tackaiznad = {pozicije[i].x, pozicije[i].y, 40};
+      
       Izvrsi(tackaiznad, BRZINA_KORAKA);
       delay(100);
-      Izvrsi(pozicije[i], 3);
+      Izvrsi(pozicije[i], BRZINA_KORAKA);
       Uhvati(1);
       delay(100);
-      Izvrsi(tackaiznad, 3);
+      Izvrsi(tackaiznad, BRZINA_KORAKA);
+      Izvrsi(iznadSkladista, BRZINA_KORAKA);
+      Izvrsi(Skladiste, BRZINA_KORAKA);
+      Serial.println("spusio se");
       Uhvati(0);
+      Serial.println("ostavio");
+      delay(100);
+      Izvrsi(iznadSkladista, BRZINA_KORAKA);
 
     }
       //Vrati se na poziciju gde ne smetas kameri
@@ -87,6 +96,9 @@ void CitajSerijsku() {
         pozicije[i] = StringToPoint3D(naredbe[i]);
         Serial.print("Primljen broj ");
         Serial.println(i);
+      }
+      for(int i = 0; i<brojkomandi; i++) {
+        Serial.println(naredbe[i]);
       }
     } else if(ulaz.charAt(0)=='K') {
       Izvrsi(PregledPozicija, BRZINA_KORAKA);

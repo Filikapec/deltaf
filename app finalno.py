@@ -156,10 +156,10 @@ class App(customtkinter.CTk):
         
         for i in range(len(pozicije)):
             #print(str(pozicije[i].x) + " " + str(pozicije[i].y) + " " + str(pozicije[i].gr))
-            pozicije[i].x = pozicije[i].x * 50 / 150 - 81.8
-            pozicije[i].y = pozicije[i].y * 50 / 150 - 87.8
+            pozicije[i].x = (pozicije[i].x - 248) * 23.7 / 74
+            pozicije[i].y = (pozicije[i].y - 248) * 23.7 / 74
             #print(str(pozicije[i].x) + " " + str(pozicije[i].y) + " " + str(pozicije[i].gr))
-            pozicijaZaPoslati = str(str(round(pozicije[i].y, 2)) + " " + str(round(pozicije[i].x, 2)) + " " + "5")
+            pozicijaZaPoslati = str(str(round(pozicije[i].y, 2)) + " " + str(round(pozicije[i].x, 2)) + " " + "23") #23=4+19
             #delta.write(bytes(pozicijaZaPoslati, 'utf-8'))
             #print("---------------------------------")
             print(bytes(pozicijaZaPoslati, 'utf-8'))
@@ -246,7 +246,8 @@ class App(customtkinter.CTk):
                     indexobjekta+=1
                     brojregistrovanihobjekata+=1
                     cv2.putText(frame, ("Objekat broj: " + str(indexobjekta)), (x+w+20, y+20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
-                    cv2.putText(frame, ("Dimenzije: " + str(w) + " " + str(h)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
+                    #cv2.putText(frame, ("Dimenzije: " + str(w) + " " + str(h)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
+                    cv2.putText(frame, ("Poz: " + str(x+w/2) + " " + str(y+h/2)), (x,y), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,255), 2)
             
 
         if len(mask_contours2) != 0:
@@ -301,6 +302,6 @@ if __name__ == "__main__":
 
 
 #Proporcija je da je 150px = 50mm
-# Preciznije 68px = 23.7mm
+# Preciznije 74px = 23.7mm
 
 #32.4 i 35
